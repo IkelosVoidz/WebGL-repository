@@ -1,19 +1,30 @@
-import { initWebGL } from './webgl.js';
+import { initWebGL , resizeCanvasToDisplaySize } from './webgl.js';
 import { createShader, createProgram } from './shaderUtils.js';
 import { Circle } from './circle.js';
+import { RangeController } from './rangeController.js';
 
+//Globals 
 let gl;
 let program;
 let circle;
 
-function init() {
+function showError(error) {
+  const errorContainer = document.getElementById('errorContainer');
+  
+  errorContainer.innerText = error;
+  console.error(error);
+}
+function initControls(){
+  const speedRangeController = new RangeController('speed', 0, 10);
+  const scaleRangeController = new RangeController('scale', 0.1, 10 , 0.1);
+  const redRangeController = new RangeController('red', 0, 255);
+  const greenRangeController = new RangeController('green', 0, 255);
+  const blueRangeController = new RangeController('blue', 0, 255);
+}
+function initGL() {
   const canvas = document.getElementById('glCanvas');
+  if(!canvas) throw new Error("Canvas not found - double check that the ID is correct");
   gl = initWebGL(canvas);
-
-  if (!gl) {
-    console.error('Unable to initialize WebGL. Your browser may not support it.');
-    return;
-  }
 
   const vertexShaderSource = `
     attribute vec2 a_position;
@@ -50,13 +61,19 @@ function init() {
 }
 
 function render() {
+  resizeCanvasToDisplaySize(gl.canvas);
+  gl.clearColor(0.2, 0.2, 0.2, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  gl.clearColor(0.9, 0.9, 0.9, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT);
 
   circle.draw();
 
   requestAnimationFrame(render);
 }
 
-init();
+try {
+  initControls();
+  initGL();
+} catch (error) {
+  showError(error);
+}

@@ -1,9 +1,8 @@
 export function initWebGL(canvas) {
-  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  const gl = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
   if (!gl) {
-    console.error('WebGL not supported');
-    return null;
+    throw new Error("WebGL not supported");
   }
 
   resizeCanvasToDisplaySize(canvas);
@@ -11,7 +10,7 @@ export function initWebGL(canvas) {
   return gl;
 }
 
-function resizeCanvasToDisplaySize(canvas) {
+export function resizeCanvasToDisplaySize(canvas) {
   const displayWidth = canvas.clientWidth;
   const displayHeight = canvas.clientHeight;
 

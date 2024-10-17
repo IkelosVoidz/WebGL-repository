@@ -4,9 +4,10 @@ export function createShader(gl, type, source) {
   gl.compileShader(shader);
 
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+    const compileError =  gl.getShaderInfoLog(shader);
+    const typeString = type === gl.VERTEX_SHADER ? 'vertex' : 'fragment';
     gl.deleteShader(shader);
-    return null;
+    throw new Error(`Failed to COMPILE ${typeString} shader: ${compileError}`);
   }
 
   return shader;
@@ -19,8 +20,7 @@ export function createProgram(gl, vertexShader, fragmentShader) {
   gl.linkProgram(program);
 
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    console.error('Unable to initialize the shader program: ' + gl.getProgramInfoLog(program));
-    return null;
+    throw new Error(`ERROR Unable to initialize the shader program: ${gl.getProgramInfoLog(program)}`);
   }
 
   return program;
