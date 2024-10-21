@@ -38,31 +38,37 @@
           <div class="controls-container">
               <div class="d-flex flex-column justify-content-between">
                 <h3 class="text-center">Controls</h3>
+             
+                <h6 class="text-center">Opcions onada</h6>
                 <div class="mb-1">
-                  <label for="speedRange" class="d-inline-flex form-label mb-0">Velocitat-<p id="speedLabel">0</p> </label>
-                  <input type="range" class="form-range" id="speedRange">
+                  <label for="tideRange" class="d-inline-flex form-label mb-0">Marea: <p id="tideLabel">0</p> </label>
+                  <input type="range" class="form-range" id="tideRange">
                 </div>
                 <div class="mb-1">
-                  <label for="scaleRange" class="d-inline-flex form-label mb-0">Escala-<p id="scaleLabel">0</p> </label>
-                  <input type="range" class="form-range" id="scaleRange">
-                </div>
-                <h6 class="text-center">Color</h6>
-                <div class="mb-1">
-                  <label for="redRange" class="d-inline-flex form-label mb-0">Vermell-<p id="redLabel">255</p> </label>
-                  <input type="range" class="form-range"  id="redRange"> 
+                  <label for="pointsRange" class="d-inline-flex form-label mb-0">N.Punts: <p id="pointsLabel">0</p> </label>
+                  <input type="range" class="form-range"  id="pointsRange"> 
                 </div>
                 <div class="mb-1">
-                  <label for="greenRange" class="d-inline-flex form-label mb-0">Verd-<p id="greenLabel">255</p> </label>
-                  <input type="range" class="form-range" id="greenRange">
+                  <label for="amplitudeRange" class="d-inline-flex form-label mb-0">Amplada: <p id="amplitudeLabel">0</p> </label>
+                  <input type="range" class="form-range" id="amplitudeRange">
                 </div>
                 <div class="mb-1">
-                  <label for="blueRange" class="d-inline-flex form-label mb-0">Blau-<p id="blueLabel">255</p> </label>
-                  <input type="range" class="form-range" id="blueRange">
+                  <label for="frequencyRange" class="d-inline-flex form-label mb-0">Frequencia: <p id="frequencyLabel">0</p> </label>
+                  <input type="range" class="form-range" id="frequencyRange">
+                </div>
+                <h6 class="text-center">Opcions estrelles</h6>
+                <div class="mb-1">
+                  <label for="sizeRange" class="d-inline-flex form-label mb-0">M.punts: <p id="sizeLabel">0</p> </label>
+                  <input type="range" class="form-range" id="sizeRange">
+                  <button id="resetButton" class="btn btn-primary">Randomitzar</button>
+                </div>
+                <h6 class="text-center">Opcions Fondo</h6>
+                <div class="mb-1">
+                  <label for="gradientRange" class="d-inline-flex form-label mb-0">Gradient: <p id="gradientLabel">0</p> </label>
+                  <input type="range" class="form-range" id="gradientRange">
+                 
                 </div>
               </div>
-              <h6 class="text-center">Errors</h6>
-
-              <div id="errorContainer" class="mb-0 alert alert-danger">This is what an error looks like</div>
           </div>
         </div>
       </div>
