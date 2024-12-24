@@ -25,7 +25,9 @@ export function createWall(location, Zscale, name, rotAngle = 0.0, axis = [0.0, 
   wall.modelMatrix = multiplyAll(matrices);
   wall.material = { ...Perl };
   wall.name = name;
-  wall.file = '../../textures/concrete.jpg';
+  wall.file = './textures/concrete.jpg';
+
+ 
   wall.procedural = 0;
   return wall;
 }
@@ -35,7 +37,7 @@ export function createStand(location, material, name) {
   var stand = { ...exampleCube };
 
   stand.material = { ...material };
-  stand.file = '../../textures/stand.jpg';
+  stand.file = './textures/stand.jpg';
   stand.name = name;
   transform(stand, location, [0.0, 0.0, 0.0], [0.4, 1.1, 0.4]);
   stand.procedural = 1;
