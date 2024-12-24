@@ -57,7 +57,7 @@ export function createCustom3DModel(
   var obj = { ...model };
 
   obj.material = { ...material };
-  obj.file = '../../textures/stand.jpg';
+  obj.file = './textures/stand.jpg';
   obj.name = name;
   transform(obj, location, rotation, scale);
   obj.procedural = 0;
