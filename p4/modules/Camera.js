@@ -101,7 +101,21 @@ class Camera {
     const center = [this.position[0] + front[0], this.position[1] + front[1], this.position[2] + front[2]];
 
     mat4.lookAt(viewMatrix, this.position, center, [0, 1, 0]);
+
     return viewMatrix;
+  }
+
+  getViewTransform() {
+    return {
+      position: [...this.position],
+      rotation: [this.pitch, this.yaw]
+    };
+  }
+
+  teleport({ position, rotation }) {
+    this.position = [...position];
+    this.yaw = rotation[1];
+    this.pitch = rotation[0];
   }
 }
 

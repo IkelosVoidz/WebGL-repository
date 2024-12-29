@@ -27,7 +27,6 @@ export function createWall(location, Zscale, name, rotAngle = 0.0, axis = [0.0, 
   wall.name = name;
   wall.file = './textures/concrete.jpg';
 
- 
   wall.procedural = 0;
   return wall;
 }
@@ -46,14 +45,7 @@ export function createStand(location, material, name) {
 }
 
 //Function to create .json files which store vertices and indices
-export function createCustom3DModel(
-  model,
-  location,
-  scale,
-  material,
-  name,
-  rotation = [0.0, 0.0, 0.0]
-) {
+export function createCustom3DModel(model, location, scale, material, name, rotation = [0.0, 0.0, 0.0]) {
   var obj = { ...model };
 
   obj.material = { ...material };

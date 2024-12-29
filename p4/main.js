@@ -20,14 +20,26 @@ import { RangeController } from './modules/rangeController.js';
 let gl;
 let program;
 let camera;
-let lights = [
+
+const lights = [
   new Light([10.0, 7.0, 0.0], [1.0, 0.4, 0.4], [0.8, 0.8, 0.8], [0.5, 0.5, 0.5]),
   new Light([-10.0, 7.0, 0.0], [0.4, 1.0, 0.4], [0.7, 0.7, 0.7], [0.6, 0.6, 0.6]),
   new Light([0.0, 7.0, 10.0], [0.4, 0.4, 1.0], [0.6, 0.6, 0.6], [0.7, 0.7, 0.7])
 ];
-const sceneObjects = [];
 const lightSelector = document.getElementById('lightSelect');
+
+const poiSelector = document.getElementById('poiSelect');
+
+const goToPoiBtn = document.getElementById('goToPoiBtn');
+const savePoiBtn = document.getElementById('savePoiBtn');
+
+const sceneObjects = [];
 const controllers = [];
+const POIs = [
+  { position: [0, 1, 5], rotation: [0, 0, 0] },
+  { position: [5, 1, 0], rotation: [0, Math.PI / 2, 0] },
+  { position: [-5, 1, 0], rotation: [0, -Math.PI / 2, 0] }
+];
 
 function showError(error) {
   const errorContainer = document.getElementById('errorContainer');
@@ -76,26 +88,88 @@ async function createEnvironment() {
       position = standPositions[Math.floor(Math.random() * standPositions.length)];
     } while (usedPositions.has(position));
     usedPositions.add(position);
-    return [position[0], .3 , position[2]];
-  }
+    return [position[0], 0.3, position[2]];
+  };
 
   const weapons = [
-    { model: axe1, name: 'axe1', position: getRandomPosition(), rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4] },
-    { model: axe2, name: 'axe2', position: getRandomPosition(), rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4] },
-    { model: axe3, name: 'axe3', position: getRandomPosition(), rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4] },
+    {
+      model: axe1,
+      name: 'axe1',
+      position: getRandomPosition(),
+      rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4]
+    },
+    {
+      model: axe2,
+      name: 'axe2',
+      position: getRandomPosition(),
+      rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4]
+    },
+    {
+      model: axe3,
+      name: 'axe3',
+      position: getRandomPosition(),
+      rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4]
+    },
     { model: bow, name: 'bow', position: getRandomPosition(), rotation: [0, Math.random() * 2 * Math.PI, Math.PI / 4] },
-    { model: dagger, name: 'dagger', position: getRandomPosition(), rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4] },
-    { model: hammer, name: 'hammer', position: getRandomPosition(), rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4] },
-    { model: mace, name: 'mace', position: getRandomPosition(), rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4] },
-    { model: spear, name: 'spear', position: getRandomPosition(), rotation: [0, Math.random() * 2 * Math.PI, Math.PI / 4] },
-    { model: sword1, name: 'sword1', position: getRandomPosition(), rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4] },
-    { model: sword2, name: 'sword2', position: getRandomPosition(), rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4] },
-    { model: sword3, name: 'sword3', position: getRandomPosition(), rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4] },
-    { model: sword4, name: 'sword4', position: getRandomPosition(), rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4] }
+    {
+      model: dagger,
+      name: 'dagger',
+      position: getRandomPosition(),
+      rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4]
+    },
+    {
+      model: hammer,
+      name: 'hammer',
+      position: getRandomPosition(),
+      rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4]
+    },
+    {
+      model: mace,
+      name: 'mace',
+      position: getRandomPosition(),
+      rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4]
+    },
+    {
+      model: spear,
+      name: 'spear',
+      position: getRandomPosition(),
+      rotation: [0, Math.random() * 2 * Math.PI, Math.PI / 4]
+    },
+    {
+      model: sword1,
+      name: 'sword1',
+      position: getRandomPosition(),
+      rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4]
+    },
+    {
+      model: sword2,
+      name: 'sword2',
+      position: getRandomPosition(),
+      rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4]
+    },
+    {
+      model: sword3,
+      name: 'sword3',
+      position: getRandomPosition(),
+      rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4]
+    },
+    {
+      model: sword4,
+      name: 'sword4',
+      position: getRandomPosition(),
+      rotation: [Math.PI, Math.random() * 2 * Math.PI, Math.PI / 4]
+    }
   ];
 
   weapons.forEach((weapon) => {
-    const obj = createCustom3DModel(weapon.model, weapon.position, [0.5, 0.5, 0.5], randomMaterial(), weapon.name, weapon.rotation);
+    const obj = createCustom3DModel(
+      weapon.model,
+      weapon.position,
+      [0.5, 0.5, 0.5],
+      randomMaterial(),
+      weapon.name,
+      weapon.rotation
+    );
     obj.movable = true;
     obj.initialLocation = weapon.position;
     obj.initialRotation = weapon.rotation;
@@ -117,14 +191,35 @@ function initControls() {
   });
   lightSelector.selectedIndex = 0;
 
+  POIs.forEach((poi, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.text = `POI ${i + 1}`;
+    poiSelector.appendChild(opt);
+  });
+
+  goToPoiBtn.onclick = () => {
+    camera.teleport(POIs[poiSelector.selectedIndex]);
+  };
+
+  savePoiBtn.onclick = () => {
+    POIs.push(camera.getViewTransform());
+    const i = POIs.length - 1;
+
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.text = `POI ${i + 1}`;
+    poiSelector.appendChild(opt);
+  };
+
   controllers['light'] = new LightController(lights[0]);
 
   lightSelector.onchange = () => {
     controllers['light'].switchLight(lights[lightSelector.selectedIndex]);
   };
 
-  controllers['speed'] =  new RangeController('speed', 0.1, 2.0, 0.1, 0.2);
-
+  controllers['speed'] = new RangeController('speed', 0.1, 2.0, 0.1, 0.2);
+  controllers['reflections'] = new RangeController('reflections', 0, 3, 1, 2);
 }
 
 function initShaders(vertexShaderSource, fragmentShaderSource) {
@@ -163,7 +258,6 @@ function initShaders(vertexShaderSource, fragmentShaderSource) {
   // uniforms needed for texture flags
   program.allowTextureIndex = gl.getUniformLocation(program, 'allowTexture');
   program.proceduralIndex = gl.getUniformLocation(program, 'proceduralTexture');
-  program.useToonShadingIndex = gl.getUniformLocation(program, 'useToonShading');
 
   program.ScaleIndex = gl.getUniformLocation(program, 'Scale');
   program.ThresholdIndex = gl.getUniformLocation(program, 'Threshold');
@@ -172,18 +266,7 @@ function initShaders(vertexShaderSource, fragmentShaderSource) {
   gl.uniform2f(program.ThresholdIndex, 0.3, 0.3);
   gl.uniform1f(program.allowTextureIndex, 1.0);
   gl.uniform1i(program.proceduralIndex, false);
-  gl.uniform1i(program.useToonShadingIndex, false);
 }
-
-let useToonShading = false;
-
-function toggleToonShading() {
-  useToonShading = !useToonShading;
-  gl.uniform1i(program.useToonShadingIndex, useToonShading);
-}
-
-document.getElementById('toonShadingToggle').addEventListener('click', toggleToonShading);
-
 
 function initGL() {
   const canvas = document.getElementById('glCanvas');
@@ -218,7 +301,6 @@ function initGL() {
     }
   `;
 
-  
   const fragmentShaderSource = `#version 300 es
     precision mediump float;
     uniform float allowTexture;
@@ -262,12 +344,6 @@ function initGL() {
 
     }
     
-    vec3 toonShading (vec3 N, vec3 L) {
-      float NdotL = max(0.0, dot(N, L));
-      float levels = 4.0; // Number of quantization levels
-      float quantized = floor(NdotL * levels) / levels;
-      return vec3(quantized);
-    }
     
     uniform vec2 Scale;
     uniform vec2 Threshold;
@@ -294,17 +370,13 @@ function initGL() {
       vec3 n = normalize(N);
       vec3 V = normalize(-ec1);
 
-      if (useToonShading) {
-        vec3 L = normalize(Lights[0].Position - ec1); 
-        color = toonShading(n, L);
-      } else {
-        for (int i = 0; i < 3; i++) {
-          if (Lights[i].enabled) {
-            vec3 L = normalize(Lights[i].Position - ec1);
-            color += phong(n, L, V, Lights[i]);
-          }
+      for (int i = 0; i < 3; i++) {
+        if (Lights[i].enabled) {
+          vec3 L = normalize(Lights[i].Position - ec1);
+          color += phong(n, L, V, Lights[i]);
         }
       }
+      
 
       if (allowTexture == 1.0) {
         fragmentColor = texture(myTexture, texCoords * repetition) * vec4(color, 1.0) * 0.9;
@@ -361,7 +433,7 @@ function drawObject(gl, program, model, viewMatrix, projectionMatrix) {
 function animateObject(obj, time) {
   const speed = 0.5; // Speed of the sinusoidal movement
   const amplitude = 0.1; // Amplitude of the sinusoidal movement
-  const rotationSpeed = .5; // Speed of the yaw rotation
+  const rotationSpeed = 0.5; // Speed of the yaw rotation
 
   const yOffset = amplitude * Math.sin(time * speed);
   const yawRotation = obj.initialRotation[1] + time * rotationSpeed;
@@ -387,7 +459,7 @@ function render() {
   camera.setSpeed(parseFloat(controllers['speed'].value));
 
   for (const obj of sceneObjects) {
-    if(obj.movable){
+    if (obj.movable) {
       animateObject(obj, time);
     }
 
