@@ -35,7 +35,7 @@
         border-radius: 10px;
         width: 100%;
         height: 100%;
-        background-color: #ff0000;
+        background-color: #474747;
       }
 
       .controls-container {
@@ -50,25 +50,20 @@
     <div class="container-fluid">
       <div class="mt-4 row">
         <div class="col-9">
-          <canvas id="glCanvas"></canvas>
+          <canvas id="glcanvas"></canvas>
         </div>
         <div class="col-3">
           <div class="controls-container">
             <div class="d-flex flex-column justify-content-between">
               <h3 class="text-center">Controls</h3>
-              <fh6 class="text-center">Camara</fh6>
-              <div class="mb-1">
-                <label
-                  for="speedRange"
-                  class="d-inline-flex form-label mb-0"
-                  >Velocitat:
-                  <p id="speedLabel">0</p>
+              <fh6 class="text-center">Camera</fh6>
+              <div class="mx-auto">
+                <label class="d-inline-flex form-label mb-0 text-center" style="font-size: small;">
+                  Pos:
+                  <p class="px-2" id="cameraPosition">[0, 0, 0]</p>
+                  Center:
+                  <p class="px-2" id="cameraCenter">[0, 0, 0]</p>
                 </label>
-                <input
-                  type="range"
-                  class="form-range"
-                  id="speedRange"
-                />
               </div>
               <h6 class="text-center mb-3">Punts d'interes</h6>
               <div class="form-group d-flex align-items-center mb-3">
@@ -105,54 +100,6 @@
                   id="lightSelect"
                 ></select>
               </div>
-
-              <div class="form-group row">
-                <label
-                  for="ambientColor"
-                  class="col-sm-6 col-form-label text-left"
-                  >Ambient Color (La)</label
-                >
-                <div class="col-sm-6">
-                  <input
-                    type="color"
-                    class="form-control"
-                    id="ambientColor"
-                    style="width: 100%"
-                  />
-                </div>
-              </div>
-
-              <div class="form-group row">
-                <label
-                  for="diffuseColor"
-                  class="col-sm-6 col-form-label text-left"
-                  >Diffuse Color (Ld)</label
-                >
-                <div class="col-sm-6">
-                  <input
-                    type="color"
-                    class="form-control"
-                    id="diffuseColor"
-                    style="width: 100%"
-                  />
-                </div>
-              </div>
-
-              <div class="form-group row">
-                <label
-                  for="specularColor"
-                  class="col-sm-6 col-form-label text-left"
-                  >Specular Color (Ls)</label
-                >
-                <div class="col-sm-6">
-                  <input
-                    type="color"
-                    class="form-control"
-                    id="specularColor"
-                    style="width: 100%"
-                  />
-                </div>
-              </div>
               <h6 class="text-center">Rendering</h6>
               <div class="mb-1">
                 <label
@@ -167,6 +114,7 @@
                   id="reflectionsRange"
                 />
               </div>
+              <button class="btn btn-success mb-2" id="startBtn">Start/Update</button>
               <div
                 style="display: none"
                 id="errorContainer"
@@ -182,19 +130,14 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
-    <script src="gl-matrix-min.js"></script>
-    <script src="imported-models/axe1.json"></script>
-    <script src="imported-models/axe2.json"></script>
-    <script src="imported-models/axe3.json"></script>
-    <script src="imported-models/bow.json"></script>
-    <script src="imported-models/dagger.json"></script>
-    <script src="imported-models/hammer.json"></script>
-    <script src="imported-models/mace.json"></script>
-    <script src="imported-models/spear.json"></script>
-    <script src="imported-models/sword1.json"></script>
-    <script src="imported-models/sword2.json"></script>
-    <script src="imported-models/sword3.json"></script>
-    <script src="imported-models/sword4.json"></script>
+    <script src="gl-matrix/common.js"></script>
+		<script type="text/javascript" src="gl-matrix/vec3.js"></script>
+		<script type="text/javascript" src="gl-matrix/vec2.js"></script>
+		<script type="text/javascript" src="gl-matrix/vec4.js"></script>
+		<script type="text/javascript" src="gl-matrix/vec4.js"></script>
+		<script type="text/javascript" src="gl-matrix/mat4.js"></script>
+		<script type="text/javascript" src="gl-matrix/mat3.js"></script>
+		<script type="text/javascript" src="gl-matrix/quat.js"></script>
     <script
       type="module"
       src="./main.js"

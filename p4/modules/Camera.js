@@ -1,121 +1,163 @@
+
+
 class Camera {
-  constructor(gl, canvas) {
-    this.gl = gl;
+  constructor(canvas, camValues) {
     this.canvas = canvas;
-    this.position = [0, 0, 6];
-    this.speed = 0.1;
-    this.mouseSensitivity = 0.002;
-    this.pitch = 0;
-    this.yaw = -Math.PI / 2;
-    this.mouseActive = false;
+    this.position = camValues.position; 
+    this.centre = camValues.centre; 
+    this.up = camValues.up; 
+    this.fov = camValues.fov;
+
+    this.X = camValues.X;
+    this.Y = camValues.Y;
+    this.Z = camValues.Z;
+
+    this.speed = 0.25;
+    this.mouseSensitivity = 0.005;
+    this.isMouseDown = false;
+
+    this.theta = Math.PI;
+    this.phi = -Math.PI / 2.0;
+ 
+    this.lastTheta = 0.0;
+    this.lastPhi = 0.0;
 
     this.initEventListeners();
+    this.listeners = []; // To hold the event listeners
+
   }
 
+  onCameraMoved(callback) {
+    this.listeners.push(callback);
+  }
+
+  dispatchOnMovedEvent() {
+    for (let listener of this.listeners) {
+      listener(); 
+    }
+  }
   initEventListeners() {
-    window.addEventListener('keydown', (e) => this.onKeyDown(e));
-    window.addEventListener('keyup', (e) => this.onKeyUp(e));
-    this.canvas.addEventListener('mousedown', () => this.onMouseDown());
-    this.canvas.addEventListener('mouseup', () => this.onMouseUp());
-    this.canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
-    this.canvas.addEventListener('mouseleave', () => this.onMouseLeave());
+    document.addEventListener('keydown', (e) => this.onKeyDown(e), false);
+    this.canvas.addEventListener('mousedown', (e) => this.onMouseDown(e), false);
+    this.canvas.addEventListener('mouseup', () => this.onMouseUp(), false);
+    this.canvas.addEventListener('mousemove', (e) => this.onMouseMove(e), false);
   }
 
-  setSpeed(speed) {
-    this.speed = speed;
+  calculateNewCentre() {
+    const centre = vec3.fromValues(this.centre[0], this.centre[1], this.centre[2]);
+    const pos = this.position;
+    const radius = vec3.length(vec3.subtract(centre, pos));
+    const x = radius * Math.sin(this.phi) * Math.sin(this.theta);
+    const y = radius * Math.cos(this.phi);
+    const z = radius * Math.sin(this.phi) * Math.cos(this.theta);
+
+    this.centre = [this.position[0] + x, this.position[1] + y, this.position[2] + z];
   }
 
   onKeyDown(event) {
-    const front = [
-      Math.cos(this.pitch) * Math.cos(this.yaw),
-      Math.sin(this.pitch),
-      Math.cos(this.pitch) * Math.sin(this.yaw)
-    ];
-    const right = [-Math.sin(this.yaw), 0, Math.cos(this.yaw)];
-
-    switch (event.key) {
-      case 'w':
-        this.position[0] += front[0] * this.speed;
-        this.position[1] += front[1] * this.speed;
-        this.position[2] += front[2] * this.speed;
+    
+    let update = false;
+    switch (event.key.toLowerCase()) {
+      case 'w': // Move forward
+        this.position[2] -= this.speed;
+        this.centre[2] -= this.speed;
+        update = true;
         break;
-      case 's':
-        this.position[0] -= front[0] * this.speed;
-        this.position[1] -= front[1] * this.speed;
-        this.position[2] -= front[2] * this.speed;
+  
+      case 's': // Move backward
+        this.position[2] += this.speed;
+        this.centre[2] += this.speed;
+        update = true;
         break;
-      case 'a':
-        this.position[0] -= right[0] * this.speed;
-        this.position[1] -= right[1] * this.speed;
-        this.position[2] -= right[2] * this.speed;
+  
+      case 'a': // Move left
+        this.position[0] -= this.speed;
+        this.centre[0] -= this.speed;
+        update = true;
         break;
-      case 'd':
-        this.position[0] += right[0] * this.speed;
-        this.position[1] += right[1] * this.speed;
-        this.position[2] += right[2] * this.speed;
+  
+      case 'd': // Move right
+        this.position[0] += this.speed;
+        this.centre[0] += this.speed;
+        update = true;
         break;
-      case 'ArrowUp':
+  
+      case 'arrowup': // Move up
         this.position[1] += this.speed;
+        this.centre[1] += this.speed;
+        update = true;
         break;
-      case 'ArrowDown':
+  
+      case 'arrowdown': // Move down
         this.position[1] -= this.speed;
+        this.centre[1] -= this.speed;
+        update = true;
         break;
     }
+
+    event.preventDefault();
+    if(update) this.dispatchOnMovedEvent();
   }
+  
 
-  onKeyUp(event) {}
-
-  onMouseDown() {
-    this.mouseActive = true;
+  onMouseDown(event) {
+    this.isMouseDown = true;
+    this.lastTheta = event.clientX;
+    this.lastPhi = event.clientY;
+    event.preventDefault();
   }
 
   onMouseUp() {
-    this.mouseActive = false;
-  }
-
-  onMouseLeave() {
-    this.mouseActive = false;
+    this.isMouseDown = false;
   }
 
   onMouseMove(event) {
-    if (!this.mouseActive) return;
+    if (!this.isMouseDown) return;
 
-    const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-    const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+    const deltaX = event.clientX - this.lastTheta;
+    const deltaY = event.clientY - this.lastPhi;
 
-    this.yaw += movementX * this.mouseSensitivity;
-    this.pitch -= movementY * this.mouseSensitivity;
+    this.theta += deltaX * this.mouseSensitivity;
+    this.phi -= deltaY * this.mouseSensitivity;
 
-    // Limit pitch to prevent flipping
-    this.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.pitch));
+    // Clamp `phi` to avoid flipping over
+    const margin = Math.PI / 4;
+    this.phi = Math.min(Math.max(this.phi, margin), Math.PI - margin);
+
+    if (this.theta < 0) this.theta += Math.PI * 2;
+    if (this.phi < 0) this.phi += Math.PI * 2;
+
+    this.lastPhi = event.clientY;
+    this.lastTheta = event.clientX;
+
+    this.calculateNewCentre();
+    event.preventDefault();
+    this.dispatchOnMovedEvent();
   }
 
-  getViewMatrix() {
-    const viewMatrix = mat4.create();
-    const front = [
-      Math.cos(this.pitch) * Math.cos(this.yaw),
-      Math.sin(this.pitch),
-      Math.cos(this.pitch) * Math.sin(this.yaw)
-    ];
-
-    const center = [this.position[0] + front[0], this.position[1] + front[1], this.position[2] + front[2]];
-
-    mat4.lookAt(viewMatrix, this.position, center, [0, 1, 0]);
-
-    return viewMatrix;
+  calculateAxis(){
+    this.Z = vec3.normalize(vec3.subtract(this.position, this.centre)); // |O - C|
+    this.X = vec3.normalize(vec3.cross(this.up, this.Z)); // |up x Z|
+    this.Y = vec3.cross(this.Z, this.X); // Z x X
   }
 
-  getViewTransform() {
+  getCameraValues() {
     return {
-      position: [...this.position],
-      rotation: [this.pitch, this.yaw]
+      position: this.position,
+      centre: this.centre,
+      up: this.up,
+      fov: this.fov,
+      X: this.X,
+      Y: this.Y,
+      Z: this.Z
     };
   }
 
-  teleport({ position, rotation }) {
-    this.position = [...position];
-    this.yaw = rotation[1];
-    this.pitch = rotation[0];
+  teleport(position , centre){  
+    this.position = position;
+    this.centre = centre;
+
+    this.dispatchOnMovedEvent();
   }
 }
 
